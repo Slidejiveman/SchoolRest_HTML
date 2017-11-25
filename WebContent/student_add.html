@@ -1,0 +1,110 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Add Student</title>
+<link rel="stylesheet" type="text/css" href="php_style.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script>
+function getPlace(zip) {
+    if(zip != '') {
+    	// Remove references to PHP files
+	    $.getJSON("getCityState4.php", {zip: zip})
+		    .done(function(data){
+			    if($("#city").val() == '') {
+				    $("#city").val(data.city);
+				}
+			    if($("#state").val() == '') {
+			        $("#state").val(data.state_code);
+				}	
+			})
+			.fail(function(jqXHR, textStatus, errorThrown){
+			    console.log("I AM ERROR " + textStatus);
+				console.log("Incoming Text" + jqXHR.responseText);}); 
+	} 
+    
+    $.urlParam = function(name){
+        var results = new RegExp('[\?&]' + name + 
+        		'=([^&#]*)').exec(window.location.href);
+        if (results == null){
+           return null;
+        }
+        else{
+           return results[1] || 0;
+        }
+    }  
+    
+    //NEED FUNCTION HEADER
+    $.ajax( { 
+    	url:"http://localhost/SchoolRest/rest/studentservice/students/",
+    	type: "POST",
+    	dataType: "json",
+    	contentType: "application/json",
+    	data: '{'+  
+    		'"idNumber" : "'+idNumber+'",'+
+    		'"firstName" :"'+ firstName+'",'+
+    		'"lastName" : "'+lastName+'",'+
+    		'"city" : "'+city+'",'+
+    		'"state" : "'+state+'",'+
+    		'"zip" : "'+zip+'",'+
+    		'"email" : "'+email+'",'+
+    		'"classification" : "'+classification+'",'+
+    		'"gender" : "'+gender+'"'+
+    		"}",
+    	success : function(data) {
+    		 console.log("Add success ");
+    		 window.location.assign("http://localhost/StudentRest-HTML/student-list.html");
+    		 console.log("Add after change href");			 
+    		 },
+    	fail : function(jqXHR, textStatus, errorThrown) {
+    	  	  console.log("error " + textStatus);
+    	  	  console.log("incoming Text " + jqXHR.responseText);
+    	  	   }
+    });
+}
+</script>
+</head>
+<body>
+<h1>Add a Student</h1>
+
+<p><span class="error">* required field.</span></p>
+<form method="post" action="">
+   Id: <input type="text" name="id" value="">
+   <span class="error">* </span>
+   <br><br>
+   First Name: <input type="text" name="first_name" value="">
+   <span class="error">* </span>
+   <br><br>
+   Last Name: <input type="text" name="last_name" value="">
+   <span class="error">* </span>
+   <br><br>
+   Zip: <input id="zip" type="text" name="zip" onblur="getPlace(this.value)" value="">
+   <span class="error">* </span>
+   <br><br>
+   City: <input id="city" type="text" name="city" value="">
+   <span class="error">* </span>
+   <br><br>
+   State: <input id="state" type="text" name="state" value="">
+   <span class="error">* </span>
+   <br><br>
+   E-mail: <input type="text" name="email" value="">
+   <span class="error">* </span>
+   <br><br>
+   Classification: <input type="radio" name="classification" value="Freshman">Freshman
+   <input type="radio" name="classification" value="Sophomore">Sophomore
+   <input type="radio" name="classification" value="Junior">Junior
+   <input type="radio" name="classification" value="Senior">Senior
+   
+   <br><br>
+   Gender:
+   <input type="radio" name="gender" value="Female">Female
+   <input type="radio" name="gender" value="Male">Male
+   
+   <br><br>
+   <input class="button_input" type="submit" name="submit" value="Submit">
+</form>
+<form class="inline" action="" method="get">
+    <button class="button_input" type="submit">Cancel</button>
+</form>
+
+</body>
+</html>

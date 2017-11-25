@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Delete</title>
+<link rel="stylesheet" type="text/css" href="php_style.css">
+<script>
+$.urlParam = function(name){
+    var results = new RegExp('[\?&]' + name + 
+    		'=([^&#]*)').exec(window.location.href);
+    if (results == null){
+       return null;
+    }
+    else{
+       return results[1] || 0;
+    }
+}  
+
+//DELETE a student request
+$("#deletebtn").click(function (e){
+	console.log("delete function");
+	$('#deleteMessage').html("Deleting record ... Wait");
+	$('#deletebtn').attr("disabled", true);
+	$.ajax({ 
+		url:"http://localhost/SchoolRest/rest/studentservice/students/"+$.urlParam("id"),
+		type: "DELETE",
+	    success: (function(data) {
+		  console.log("Delete success ");
+		  window.location.assign("http://localhost/StudentRest-HTML/student-list.html");
+		  console.log("Delete after change href");
+	  }),
+	  fail: (function(jqXHR, textStatus, errorThrown) {
+ 	      console.log("Delete error " + textStatus);
+ 	      console.log("incoming Text " + jqXHR.responseText);
+	  })
+  	 });
+});
+</script>
+</head>
+<body>
+<h1>Delete</h1>
+
+<div id="divbutton">
+<form class="inline" action="" method="post">
+	<input type="hidden" name="id" value="">
+	<button class="button_input" type="submit">Delete</button>
+</form>
+<form class="inline" action="" method="get">
+    <button class="button_input" type="submit">Cancel</button>
+</form>
+</div>
+</body>
+</html>

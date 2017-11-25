@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Student List</title>
+<link rel="stylesheet" type="text/css" href="php_style.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script>
+var start = 0;
+var page = 5;
+createTable(start);
+
+$(document).ready(function() {
+    $("#previous").click(function() {getPrevious()});
+	$("#next").click(function(){getNext()});
+}); 
+
+function getPrevious() {
+	start = start - page;
+	if(start < 1) {
+		start = 0;
+	}
+	createTable(start);
+}
+
+function getNext() {
+	console.log("in next");
+	if($("#student-list-table").html() &&
+			$("#student-list-table").prop('rows').length-1 == page) {
+		console.log(start);
+		start = start + page;
+	}
+	createTable(start); 
+}
+
+function createTable(start) {
+	// Remove references to .php files
+    $.getJSON("http://localhost:8080/SchoolRest/rest/StudentServices/students", {page : start, per_page : page})
+	    .done(function(response){
+		    var tableHTML = '<table id=student-list-table><tr><th></th><th width=50px>ID</th><th width=100px>First Name</th><th width=100px>Last Name</th></tr>';
+			$.each(response, function(i, student){
+			    tableHTML += '<tr><td><input type="radio"'+
+				    'onchange="selectChange()" name="selectedRow" value ='+
+					student.id+'></td><td>'+student.id+'</td><td>'+   // Slides have one less </td> here
+					student.first_name+'</td><td>'+
+					student.last_name+'</td></tr>';
+			    });
+	        tableHTML += '</table>';
+	        $('#student-list').html(tableHTML);         // This was student-list-table
+			    }).fail(function(jqXHR, textStatus, errorThrown){
+				    console.log("I AM ERROR " + textStatus);
+					console.log("Incoming Text " + jqXHR.responseText);});
+}
+
+function selectChange() {
+
+	id = getId();
+	$("#selectedId").html(id);
+	$("#updateId").val(id);
+	$("#deleteId").val(id);
+}
+
+function getId() {
+    return $('input[name=selectedRow]:checked').val();
+}
+</script>
+</head>
+<body>
+<div align="center">
+<h1>Student List</h1>
+
+<p id="selectedId"></p>
+<br>
+
+<div id="student-list"></div>
+
+<br>
+</div>
+
+<div class="divbutton">
+
+<!-- Don't put these in a <form> if for AJAX because it resubmits the page -->
+<button class="button_input" id="previous">Previous</button>
+<button class="button_input" id="next">Next</button>
+</div>
+
+<div class="divbutton">
+<form action="" method="get">
+  <button class="button_input" type="submit" value="submit" name="add">Add</button>
+</form>
+
+<form action="" method="get">
+  <input id="updateId" type="hidden" name="id" value="1">
+  <button class="button_input" type="submit" value="submit" name="update">Update</button>
+</form>
+
+<form action="" method="get">
+  <input id="deleteId" type="hidden" name="id" value="1">
+  <button class="button_input" type="submit" value="submit" name="delete">Delete</button>
+</form>
+</div>
+
+</body>
+</html>
